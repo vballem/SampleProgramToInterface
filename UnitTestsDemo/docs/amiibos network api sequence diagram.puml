@@ -1,0 +1,54 @@
+@startuml
+hide footbox
+
+skinparam backgroundColor #FFFFFF
+skinparam sequence {
+    ParticipantBackgroundColor #FFFFCC
+    ParticipantBorderColor Black
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor Black
+    ActorBackgroundColor #FADADD
+    ActorBorderColor Black
+    ArrowColor Black
+    FontColor Black
+}
+
+' Participants with spacing between them
+actor User
+participant AmiiboViewModel
+participant GetAmiibosUseCase
+participant AmiibosRepository
+participant AmiibosNetworkDataSource
+participant AmiiboService
+
+User -> AmiiboViewModel : sendIntent(FetchAmiibos)
+activate AmiiboViewModel
+
+AmiiboViewModel -> GetAmiibosUseCase : invoke(name)
+activate GetAmiibosUseCase
+
+GetAmiibosUseCase -> AmiibosRepository : getAmiibos(name)
+activate AmiibosRepository
+
+AmiibosRepository -> AmiibosNetworkDataSource : getAmiibos(name)
+activate AmiibosNetworkDataSource
+
+AmiibosNetworkDataSource -> AmiiboService : getAmiibos(name)
+activate AmiiboService
+
+AmiiboService --> AmiibosNetworkDataSource : Response<Amiibos>
+deactivate AmiiboService
+
+AmiibosNetworkDataSource --> AmiibosRepository : List<Amiibo>
+deactivate AmiibosNetworkDataSource
+
+AmiibosRepository --> GetAmiibosUseCase : Flow<List<Amiibo>>
+deactivate AmiibosRepository
+
+GetAmiibosUseCase --> AmiiboViewModel : Flow<List<Amiibo>>
+deactivate GetAmiibosUseCase
+
+AmiiboViewModel -> AmiiboViewModel : _state.emit(Success)
+deactivate AmiiboViewModel
+
+@enduml

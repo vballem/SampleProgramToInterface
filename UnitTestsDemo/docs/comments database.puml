@@ -1,0 +1,56 @@
+@startuml
+hide footbox
+
+skinparam backgroundColor #FFFFFF
+skinparam sequence {
+    ParticipantBackgroundColor #FFFFCC
+    ParticipantBorderColor Black
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor Black
+    ActorBackgroundColor #FADADD
+    ActorBorderColor Black
+    ArrowColor Black
+    FontColor Black
+}
+
+actor User
+participant CommentViewModel
+participant CommentsUseCase
+participant CommentRepository
+participant DatabaseDataSource
+participant CommentDao
+participant CommentsDatabase
+
+User -> CommentViewModel : addComment(comment)
+activate CommentViewModel
+
+CommentViewModel -> CommentsUseCase : add(comment)
+activate CommentsUseCase
+
+CommentsUseCase -> CommentRepository : addComment(comment)
+activate CommentRepository
+
+CommentRepository -> DatabaseDataSource : addComment(comment)
+activate DatabaseDataSource
+
+DatabaseDataSource -> CommentDao : addComment(CommentEntity)
+activate CommentDao
+
+CommentDao -> CommentsDatabase : write(CommentEntity)
+activate CommentsDatabase
+CommentsDatabase --> CommentDao : success
+deactivate CommentsDatabase
+
+CommentDao --> DatabaseDataSource : id
+deactivate CommentDao
+
+DatabaseDataSource --> CommentRepository : Comment
+deactivate DatabaseDataSource
+
+CommentRepository --> CommentsUseCase : Comment
+deactivate CommentRepository
+
+CommentsUseCase --> CommentViewModel : Comment
+deactivate CommentsUseCase
+
+@enduml

@@ -1,0 +1,68 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor #FFFFCC
+    BorderColor Black
+    ArrowColor Black
+    FontColor Black
+}
+
+' === Type placeholders (no generics, no compilation errors) ===
+class Amiibo
+class AmiiboList
+class AmiiboResponse
+class StateFlow
+class AmiiboIntent
+class AmiiboState
+
+' === Interfaces ===
+interface GetAmiibosUseCase {
+    +invoke(name: String): AmiiboList
+}
+
+interface AmiibosRepository {
+    +getAmiibos(name: String): AmiiboList
+}
+
+interface AmiibosNetworkDataSource {
+    +getAmiibos(name: String): AmiiboList
+}
+
+interface AmiiboService {
+    +getAmiibos(name: String): AmiiboResponse
+}
+
+' === Implementations ===
+class GetAmiibosUseCaseImpl {
+    -repository: AmiibosRepository
+    +invoke(name: String): AmiiboList
+}
+
+class AmiibosRepositoryImpl {
+    -dataSource: AmiibosNetworkDataSource
+    +getAmiibos(name: String): AmiiboList
+}
+
+class AmiibosNetworkDataSourceImpl {
+    -amiiboService: AmiiboService
+    +getAmiibos(name: String): AmiiboList
+}
+
+class AmiiboViewModel {
+    -getAmiibosUseCase: GetAmiibosUseCase
+    -state: StateFlow
+    +sendIntent(intent: AmiiboIntent)
+}
+
+' === Inheritance ===
+GetAmiibosUseCaseImpl ..|> GetAmiibosUseCase
+AmiibosRepositoryImpl ..|> AmiibosRepository
+AmiibosNetworkDataSourceImpl ..|> AmiibosNetworkDataSource
+
+' === Dependencies (constructor injection) ===
+AmiiboViewModel --> GetAmiibosUseCase : uses
+GetAmiibosUseCaseImpl --> AmiibosRepository : uses
+AmiibosRepositoryImpl --> AmiibosNetworkDataSource : uses
+AmiibosNetworkDataSourceImpl --> AmiiboService : uses
+
+@enduml
